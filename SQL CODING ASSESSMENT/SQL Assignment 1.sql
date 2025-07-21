@@ -59,6 +59,55 @@ SELECT COUNT(*) AS total_employees FROM employees;
 SELECT * FROM employees
 ORDER BY salary DESC
 LIMIT 1
+-- section B
+-- 1. Display employee names along with their department locations (using JOIN)
+
+SELECT e.emp_name, d.location
+FROM employees e
+JOIN departments d ON e.department = d.dept_name;
+
+-- 2. List departments and count of employees in each department
+
+SELECT e.department, COUNT(*) AS employee_count
+FROM employees e
+GROUP BY e.department;
+
+SELECT d.dept_name, COUNT(e.emp_id) AS employee_count
+FROM departments d
+LEFT JOIN employees e ON d.dept_name = e.department
+GROUP BY d.dept_name;
+
+
+-- 3. Show average salary per department
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department;
+
+-- 4. Find departments that have no employees (use LEFT JOIN)
+SELECT d.dept_name
+FROM departments d
+LEFT JOIN employees e ON d.dept_name = e.department
+WHERE e.emp_id IS NULL;
+
+-- 5. Find total salary paid by each department
+SELECT department, SUM(salary) AS total_salary
+FROM employees
+GROUP BY department;
+
+-- 6. Display departments with average salary > 45,000
+SELECT department, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+HAVING AVG(salary) > 45000;
+
+-- 7. Show employee name and department for those earning more than 50,000
+SELECT emp_name, department
+FROM employees
+WHERE salary > 50000;
+
+
+
+
 
 
 
