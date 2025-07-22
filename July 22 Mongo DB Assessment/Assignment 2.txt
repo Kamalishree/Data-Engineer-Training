@@ -1,0 +1,219 @@
+use movieStreamingDB
+
+db.users.insertMany([
+  { user_id: 1, name: "Arjun Mehta", email: "arjun1@example.com", country: "India" },
+  { user_id: 2, name: "Liya Thomas", email: "liya2@example.com", country: "USA" },
+  { user_id: 3, name: "Rakesh Nair", email: "rakesh3@example.com", country: "India" },
+  { user_id: 4, name: "Mei Wong", email: "mei4@example.com", country: "China" },
+  { user_id: 5, name: "Carlos Rivera", email: "carlos5@example.com", country: "Mexico" }
+])
+
+db.movies.insertMany([
+  { movie_id: 201, title: "Dream Beyond Code", genre: "Sci-Fi", release_year: 2022, duration: 120 },
+  { movie_id: 202, title: "Romance in Rain", genre: "Romance", release_year: 2019, duration: 95 },
+  { movie_id: 203, title: "The Hacker", genre: "Thriller", release_year: 2023, duration: 105 },
+  { movie_id: 204, title: "Laugh It Out", genre: "Comedy", release_year: 2018, duration: 85 },
+  { movie_id: 205, title: "Historic Tales", genre: "History", release_year: 2021, duration: 130 },
+  { movie_id: 206, title: "Space Journey", genre: "Sci-Fi", release_year: 2024, duration: 150 }
+])
+
+db.watch_history.insertMany([
+  { watch_id: 301, user_id: 1, movie_id: 201, watched_on: ISODate("2023-01-10"), watch_time: 120 },
+  { watch_id: 302, user_id: 1, movie_id: 203, watched_on: ISODate("2023-02-05"), watch_time: 100 },
+  { watch_id: 303, user_id: 2, movie_id: 202, watched_on: ISODate("2023-03-15"), watch_time: 95 },
+  { watch_id: 304, user_id: 3, movie_id: 201, watched_on: ISODate("2023-01-12"), watch_time: 100 },
+  { watch_id: 305, user_id: 4, movie_id: 206, watched_on: ISODate("2023-05-01"), watch_time: 150 },
+  { watch_id: 306, user_id: 5, movie_id: 205, watched_on: ISODate("2023-02-20"), watch_time: 120 },
+  { watch_id: 307, user_id: 1, movie_id: 201, watched_on: ISODate("2023-06-10"), watch_time: 90 },  // repeated
+  { watch_id: 308, user_id: 3, movie_id: 204, watched_on: ISODate("2023-04-18"), watch_time: 80 }
+])
+
+1. Movies with duration > 100 mins
+db.movies.find({ duration: { $gt: 100 } })
+
+ 2. Users from India
+db.users.find({ country: "India" })
+
+ 3. Movies released after 2020
+db.movies.find({ release_year: { $gt: 2020 } })
+
+4. Full watch history (user name, movie title, watch time)
+db.watch_history.aggregate([
+  {
+    $lookup: {
+      from: "users",
+      localField: "user_id",
+      foreignField: "user_id",
+      as: "user_info"
+    }
+  },
+  { $unwind: "$user_info" },
+  {
+    $lookup: {
+      from: "movies",
+      localField: "movie_id",
+      foreignField: "movie_id",
+      as: "movie_info"
+    }
+  },
+  { $unwind: "$movie_info" },
+  {
+    $project: {
+      _id: 0,
+      user_name: "$user_info.name",
+      movie_title: "$movie_info.title",
+      watch_time: 1
+    }
+  }
+])
+
+ 5. Genre watch counts
+db.watch_history.aggregate([
+  {
+    $lookup: {
+      from: "movies",
+      localField: "movie_id",
+      foreignField: "movie_id",
+      as: "movie"
+    }
+  },
+  { $unwind: "$movie" },
+  {
+    $group: {
+      _id: "$movie.genre",
+      total_views: { $sum: 1 }
+    }
+  }
+])
+
+ 6. Total watch time per user
+db.watch_history.aggregate([
+  {
+    $group: {
+      _id: "$user_id",
+      total_watch_time: { $sum: "$watch_time" }
+    }
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "_id",
+      foreignField: "user_id",
+      as: "user"
+    }
+  },
+  { $unwind: "$user" },
+  {
+    $project: {
+      _id: 0,
+      user_name: "$user.name",
+      total_watch_time: 1
+    }
+  }
+])
+
+ 7. Most watched movie (by count)
+db.watch_history.aggregate([
+  {
+    $group: {
+      _id: "$movie_id",
+      watch_count: { $sum: 1 }
+    }
+  },
+  { $sort: { watch_count: -1 } },
+  { $limit: 1 },
+  {
+    $lookup: {
+      from: "movies",
+      localField: "_id",
+      foreignField: "movie_id",
+      as: "movie"
+    }
+  },
+  { $unwind: "$movie" },
+  {
+    $project: {
+      movie_title: "$movie.title",
+      watch_count: 1
+    }
+  }
+])
+
+ 8. Users who watched more than 2 movies
+db.watch_history.aggregate([
+  {
+    $group: {
+      _id: "$user_id",
+      unique_movies: { $addToSet: "$movie_id" }
+    }
+  },
+  {
+    $project: {
+      movie_count: { $size: "$unique_movies" }
+    }
+  },
+  { $match: { movie_count: { $gt: 2 } } }
+])
+
+9. Users who watched the same movie more than once
+db.watch_history.aggregate([
+  {
+    $group: {
+      _id: { user_id: "$user_id", movie_id: "$movie_id" },
+      watch_count: { $sum: 1 }
+    }
+  },
+  { $match: { watch_count: { $gt: 1 } } },
+  {
+    $lookup: {
+      from: "users",
+      localField: "_id.user_id",
+      foreignField: "user_id",
+      as: "user"
+    }
+  },
+  { $unwind: "$user" },
+  {
+    $lookup: {
+      from: "movies",
+      localField: "_id.movie_id",
+      foreignField: "movie_id",
+      as: "movie"
+    }
+  },
+  { $unwind: "$movie" },
+  {
+    $project: {
+      user_name: "$user.name",
+      movie_title: "$movie.title",
+      watch_count: 1
+    }
+  }
+])
+
+ 10. Watch % of each movie per record
+db.watch_history.aggregate([
+  {
+    $lookup: {
+      from: "movies",
+      localField: "movie_id",
+      foreignField: "movie_id",
+      as: "movie"
+    }
+  },
+  { $unwind: "$movie" },
+  {
+    $project: {
+      _id: 0,
+      user_id: 1,
+      movie_title: "$movie.title",
+      percentage_watched: {
+        $multiply: [
+          { $divide: ["$watch_time", "$movie.duration"] },
+          100
+        ]
+      }
+    }
+  }
+])
+
