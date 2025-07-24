@@ -1,0 +1,153 @@
+1. Use Database and Create Collection
+
+use supply_chain_db;
+
+db.shipment_logs.insertMany([
+  {
+    shipment_id: "S001",
+    order_id: 1,
+    product_name: "Widget A",
+    status: "Delivered",
+    shipment_method: "Air",
+    origin: "Delhi",
+    destination: "Mumbai",
+    shipped_on: new Date("2025-07-21"),
+    delivery_date: new Date("2025-07-23"),
+    delay_days: 0
+  },
+  {
+    shipment_id: "S002",
+    order_id: 2,
+    product_name: "Gadget B",
+    status: "In Transit",
+    shipment_method: "Road",
+    origin: "Chennai",
+    destination: "Hyderabad",
+    shipped_on: new Date("2025-07-22"),
+    delivery_date: new Date("2025-07-26"),
+    delay_days: 1
+  },
+  {
+    shipment_id: "S003",
+    order_id: 3,
+    product_name: "Tool C",
+    status: "Pending",
+    shipment_method: "Sea",
+    origin: "Mumbai",
+    destination: "Kochi",
+    shipped_on: null,
+    delivery_date: null,
+    delay_days: null
+  },
+  {
+    shipment_id: "S004",
+    order_id: 4,
+    product_name: "Component D",
+    status: "Delivered",
+    shipment_method: "Road",
+    origin: "Delhi",
+    destination: "Pune",
+    shipped_on: new Date("2025-07-18"),
+    delivery_date: new Date("2025-07-22"),
+    delay_days: 1
+  },
+  {
+    shipment_id: "S005",
+    order_id: 5,
+    product_name: "Machine E",
+    status: "Delayed",
+    shipment_method: "Air",
+    origin: "Bangalore",
+    destination: "Chennai",
+    shipped_on: new Date("2025-07-19"),
+    delivery_date: new Date("2025-07-25"),
+    delay_days: 3
+  },
+  {
+    shipment_id: "S006",
+    order_id: 6,
+    product_name: "Device F",
+    status: "Delivered",
+    shipment_method: "Rail",
+    origin: "Pune",
+    destination: "Mumbai",
+    shipped_on: new Date("2025-07-20"),
+    delivery_date: new Date("2025-07-24"),
+    delay_days: 0
+  },
+  {
+    shipment_id: "S007",
+    order_id: 7,
+    product_name: "Unit G",
+    status: "Returned",
+    shipment_method: "Road",
+    origin: "Hyderabad",
+    destination: "Delhi",
+    shipped_on: new Date("2025-07-17"),
+    delivery_date: new Date("2025-07-21"),
+    delay_days: 2
+  },
+  {
+    shipment_id: "S008",
+    order_id: 8,
+    product_name: "Part H",
+    status: "In Transit",
+    shipment_method: "Air",
+    origin: "Chennai",
+    destination: "Kolkata",
+    shipped_on: new Date("2025-07-16"),
+    delivery_date: null,
+    delay_days: null
+  },
+  {
+    shipment_id: "S009",
+    order_id: 9,
+    product_name: "Accessory I",
+    status: "Delivered",
+    shipment_method: "Sea",
+    origin: "Mumbai",
+    destination: "Ahmedabad",
+    shipped_on: new Date("2025-07-15"),
+    delivery_date: new Date("2025-07-19"),
+    delay_days: 0
+  },
+  {
+    shipment_id: "S010",
+    order_id: 10,
+    product_name: "Item J",
+    status: "Delivered",
+    shipment_method: "Rail",
+    origin: "Nagpur",
+    destination: "Jaipur",
+    shipped_on: new Date("2025-07-14"),
+    delivery_date: new Date("2025-07-18"),
+    delay_days: 0
+  }
+]);
+
+
+2. Indexing for Efficient Queries
+
+
+
+// Index by order ID for fast lookup
+
+db.shipment_logs.createIndex({ order_id: 1 });
+
+
+// Index by status to filter by delivery state
+
+db.shipment_logs.createIndex({ status: 1 });
+
+
+
+// Compound index for route-based analytics
+
+db.shipment_logs.createIndex({ origin: 1, destination: 1 });
+
+
+
+// Index by delay for performance on delay-based queries
+
+db.shipment_logs.createIndex({ delay_days: 1 });
+
