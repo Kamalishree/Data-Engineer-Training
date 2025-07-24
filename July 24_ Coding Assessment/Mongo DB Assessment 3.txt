@@ -1,0 +1,173 @@
+db.jobs.insertMany([
+  { job_id: 1, title: "Backend Developer", company: "TechNova", location: "Bangalore", salary: 1200000, job_type: "remote", posted_on: new Date("2025-07-01") },
+  { job_id: 2, title: "Data Analyst", company: "InnoData", location: "Hyderabad", salary: 900000, job_type: "on-site", posted_on: new Date("2025-06-15") },
+  { job_id: 3, title: "DevOps Engineer", company: "CloudZest", location: "Chennai", salary: 1400000, job_type: "hybrid", posted_on: new Date("2025-07-10") },
+  { job_id: 4, title: "Full Stack Developer", company: "TechNova", location: "Remote", salary: 1500000, job_type: "remote", posted_on: new Date("2025-07-12") },
+  { job_id: 5, title: "UI/UX Designer", company: "DesignHive", location: "Mumbai", salary: 800000, job_type: "on-site", posted_on: new Date("2025-06-01") }
+])
+
+
+db.applicants.insertMany([
+  { applicant_id: 101, name: "Ananya Rao", skills: ["MongoDB", "Node.js", "Express"], experience: 3, city: "Hyderabad", applied_on: new Date("2025-07-10") },
+  { applicant_id: 102, name: "Rohan Iyer", skills: ["SQL", "Python", "Power BI"], experience: 2, city: "Pune", applied_on: new Date("2025-07-12") },
+  { applicant_id: 103, name: "Meena Gupta", skills: ["MongoDB", "React", "JavaScript"], experience: 4, city: "Delhi", applied_on: new Date("2025-07-14") },
+  { applicant_id: 104, name: "Kunal Deshmukh", skills: ["Java", "Spring Boot"], experience: 5, city: "Hyderabad", applied_on: new Date("2025-07-15") },
+  { applicant_id: 105, name: "Divya Sharma", skills: ["Figma", "HTML", "CSS"], experience: 1, city: "Chennai", applied_on: new Date("2025-07-16") }
+])
+
+
+db.applications.insertMany([
+  { application_id: 1001, applicant_id: 101, job_id: 1, application_status: "interview scheduled", interview_scheduled: true, feedback: "Positive" },
+  { application_id: 1002, applicant_id: 102, job_id: 2, application_status: "submitted", interview_scheduled: false, feedback: "Pending" },
+  { application_id: 1003, applicant_id: 103, job_id: 1, application_status: "interview scheduled", interview_scheduled: true, feedback: "Positive" },
+  { application_id: 1004, applicant_id: 104, job_id: 3, application_status: "rejected", interview_scheduled: false, feedback: "Needs improvement" },
+  { application_id: 1005, applicant_id: 105, job_id: 5, application_status: "submitted", interview_scheduled: false, feedback: "Under review" }
+])
+
+
+Remote jobs with salary > 10,00,000
+
+db.jobs.find({ job_type: "remote", salary: { $gt: 1000000 } })
+
+
+Applicants who know MongoDB
+
+db.applicants.find({ skills: "MongoDB" })
+
+
+Jobs posted in the last 30 days
+
+const thirtyDaysAgo = new Date();
+thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+db.jobs.find({ posted_on: { $gte: thirtyDaysAgo } })
+
+
+Applications with status ‘interview scheduled’
+
+db.applications.find({ application_status: "interview scheduled" })
+
+
+Companies with more than 2 job postings
+
+db.jobs.aggregate([
+  { $group: { _id: "$company", count: { $sum: 1 } } },
+  { $match: { count: { $gt: 2 } } }
+])
+
+
+Join applications with jobs to show job title and applicant name
+
+db.applications.aggregate([
+  {
+    $lookup: {
+      from: "jobs",
+      localField: "job_id",
+      foreignField: "job_id",
+      as: "job_info"
+    }
+  },
+  { $unwind: "$job_info" },
+  {
+    $lookup: {
+      from: "applicants",
+      localField: "applicant_id",
+      foreignField: "applicant_id",
+      as: "applicant_info"
+    }
+  },
+  { $unwind: "$applicant_info" },
+  {
+    $project: {
+      job_title: "$job_info.title",
+      applicant_name: "$applicant_info.name",
+      application_status: 1
+    }
+  }
+])
+
+
+How many applications each job received
+
+db.applications.aggregate([
+  { $group: { _id: "$job_id", application_count: { $sum: 1 } } }
+])
+
+
+Applicants who applied to more than one job
+
+db.applications.aggregate([
+  { $group: { _id: "$applicant_id", total: { $sum: 1 } } },
+  { $match: { total: { $gt: 1 } } },
+  {
+    $lookup: {
+      from: "applicants",
+      localField: "_id",
+      foreignField: "applicant_id",
+      as: "applicant_info"
+    }
+  },
+  { $unwind: "$applicant_info" },
+  { $project: { name: "$applicant_info.name", total_applications: "$total" } }
+])
+
+
+Top 3 cities with most applicants
+
+db.applicants.aggregate([
+  { $group: { _id: "$city", count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+  { $limit: 3 }
+])
+
+
+Average salary per job type
+
+db.jobs.aggregate([
+  {
+    $group: {
+      _id: "$job_type",
+      avg_salary: { $avg: "$salary" }
+    }
+  }
+])
+
+
+Update one application’s status to "offer made"
+
+db.applications.updateOne(
+  { application_id: 1002 },
+  { $set: { application_status: "offer made" } }
+)
+
+
+Delete a job with no applications
+
+db.jobs.deleteMany({
+  job_id: { $nin: db.applications.distinct("job_id") }
+})
+
+
+Add shortlisted: false to all applications
+
+db.applications.updateMany({}, { $set: { shortlisted: false } })
+
+
+Increment experience by 1 for Hyderabad applicants
+
+db.applicants.updateMany(
+  { city: "Hyderabad" },
+  { $inc: { experience: 1 } }
+)
+
+
+Remove applicants who haven’t applied to any job
+
+db.applicants.deleteMany({
+  applicant_id: { $nin: db.applications.distinct("applicant_id") }
+})
+
+
+
+
+
+
