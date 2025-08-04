@@ -1,0 +1,6 @@
+delivery_id,order_id,status,updated_at,carrier,remarks
+201,1,Delivered,2025-07-15,BlueDart,Delivered on time
+202,2,Delayed,2025-07-20,Delhivery,Delayed due to rain
+203,3,Delivered,2025-07-17,FedEx,Delivered successfully
+204,4,In Transit,2025-07-18,Ecom Express,Still in transit
+205,5,Delayed,2025-07-22,XpressBees,Customer not available
