@@ -1,0 +1,6 @@
+shipment_id,product_name,origin,destination,ship_date,expected_delivery_date,actual_delivery_date
+1,Laptop,Chennai,Delhi,2025-07-10,2025-07-15,2025-07-16
+2,Monitor,Mumbai,Chennai,2025-07-12,2025-07-17,2025-07-19
+3,Keyboard,Delhi,Kolkata,2025-07-15,2025-07-18,2025-07-18
+4,Mouse,Bangalore,Pune,2025-07-18,2025-07-22,2025-07-23
+5,Printer,Hyderabad,Ahmedabad,2025-07-20,2025-07-24,2025-07-24
