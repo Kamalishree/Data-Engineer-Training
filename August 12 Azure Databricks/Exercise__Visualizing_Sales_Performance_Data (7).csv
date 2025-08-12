@@ -1,0 +1,8 @@
+order_id,region,category,quantity,price,order_date
+O001,South,Electronics,3,15000,2025-08-01
+O002,North,Clothing,5,2000,2025-08-02
+O003,East,Furniture,2,12000,2025-08-03
+O004,West,Electronics,1,18000,2025-08-04
+O005,North,Furniture,4,9000,2025-08-05
+O006,South,Clothing,6,2500,2025-08-06
+O007,East,Electronics,2,17000,2025-08-07
