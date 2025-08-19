@@ -1,0 +1,6 @@
+supplier_id,supplier_name,contact_email,region
+101,Alpha Supplies,alpha@supplies.com,North
+102,Beta Traders,beta@traders.com,South
+103,Gamma Exports,gamma@exports.com,East
+104,Delta Goods,delta@goods.com,West
+105,Epsilon Ltd,epsilon@ltd.com,North
