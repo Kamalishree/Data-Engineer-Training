@@ -1,6 +1,0 @@
-inventory_id,product_name,stock_quantity,supplier_id,last_restock_date
-501,Laptops,50,101,2025-07-05
-502,Mobiles,100,102,2025-07-07
-503,Tablets,60,103,2025-07-09
-504,Printers,40,104,2025-07-11
-505,Accessories,150,105,2025-07-13
