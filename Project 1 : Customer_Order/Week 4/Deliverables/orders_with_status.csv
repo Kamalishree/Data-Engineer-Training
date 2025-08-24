@@ -1,0 +1,6 @@
+order_id,customer_id,order_date,delivery_date,total_amount,delay_days,customer_name,email,region,delivery_id,status,updated_at,carrier,remarks
+1,1,2025-07-10,2025-07-15,1500,5,Asha Patel,asha.patel@example.com,South,201,Delivered,2025-07-15,BlueDart,Delivered on time
+2,2,2025-07-11,2025-07-20,2300,9,Rohan Sharma,rohan.sharma@example.com,North,202,Delayed,2025-07-20,Delhivery,Delayed due to rain
+5,5,2025-07-14,2025-07-22,2500,8,Isha Kapoor,isha.kapoor@example.com,South,205,Delayed,2025-07-22,XpressBees,Customer not available
+3,3,2025-07-12,2025-07-17,1800,5,Neha Reddy,neha.reddy@example.com,West,203,Delivered,2025-07-17,FedEx,Delivered successfully
+4,4,2025-07-13,2025-08-24,2100,42,Arjun Mehta,arjun.mehta@example.com,East,204,In Transit,2025-07-18,Ecom Express,Still in transit
